@@ -1,8 +1,8 @@
 import pytest
 from pathlib import Path
-from locopilot.connection import LLMBackend, check_llm_backend
-from locopilot.utils import ensure_config_dir, get_project_files
-from locopilot.memory import SessionState, LocopilotMemory
+from connection import LLMBackend, check_llm_backend
+from utils import ensure_config_dir, get_project_files
+from memory import SessionState, LocopilotMemory
 
 
 def test_session_state():

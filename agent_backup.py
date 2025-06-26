@@ -292,14 +292,14 @@ What specific file changes need to be made? List each file and the changes."""
             return self._change_mode(parts[1] if len(parts) > 1 else None)
         elif cmd == "/clear":
             self.memory.clear()
-            return "[green]✓[/green] Memory cleared"
+            return "[green][/green] Memory cleared"
         elif cmd == "/new":
             self.memory.clear()
             self._init_project_context()
-            return "[green]✓[/green] New session started"
+            return "[green][/green] New session started"
         elif cmd == "/concise":
             self.memory.force_summarize()
-            return "[green]✓[/green] Context summarized"
+            return "[green][/green] Context summarized"
         elif cmd == "/end":
             return "exit"
         else:
@@ -319,10 +319,10 @@ What specific file changes need to be made? List each file and the changes."""
 /end           - Exit Locopilot
 
 [bold]Modes:[/bold]
-• do       - Execute coding tasks (default)
-• refactor - Refactor existing code
-• explain  - Explain code or concepts
-• chat     - General conversation
+" do       - Execute coding tasks (default)
+" refactor - Refactor existing code
+" explain  - Explain code or concepts
+" chat     - General conversation
 """
         return help_text
     
@@ -343,7 +343,7 @@ What specific file changes need to be made? List each file and the changes."""
         )
         self.memory.llm = self.llm
         
-        return f"[green]✓[/green] Model changed to [cyan]{new_model}[/cyan]"
+        return f"[green][/green] Model changed to [cyan]{new_model}[/cyan]"
     
     def _change_mode(self, new_mode: Optional[str]) -> str:
         """Change the agent mode."""
@@ -356,6 +356,6 @@ What specific file changes need to be made? List each file and the changes."""
         try:
             mode_enum = AgentMode(new_mode)
             self.memory.session_state.mode = new_mode
-            return f"[green]✓[/green] Mode changed to [cyan]{new_mode}[/cyan]"
+            return f"[green][/green] Mode changed to [cyan]{new_mode}[/cyan]"
         except ValueError:
             return f"[red]Invalid mode: {new_mode}[/red]"

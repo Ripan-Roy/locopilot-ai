@@ -50,14 +50,14 @@ Repository = "https://github.com/yourname/locopilot.git"
 Issues = "https://github.com/yourname/locopilot/issues"
 
 [project.scripts]
-locopilot = "locopilot.cli:app"
+locopilot = "cli:app"
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["locopilot"]
+py-modules = ["cli", "agent", "memory", "utils", "connection"]
 
 [tool.black]
 line-length = 88

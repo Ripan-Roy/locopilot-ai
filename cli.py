@@ -1,20 +1,16 @@
-import os
-import sys
 from pathlib import Path
 from typing import Optional
 
 import typer
-import yaml
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from rich.console import Console
 from rich.panel import Panel
-from rich.text import Text
 
-from .agent import LocopilotAgent
-from .connection import check_llm_backend, LLMBackend
-from .utils import ensure_config_dir, load_config, save_config, print_banner
+from agent import LocopilotAgent
+from connection import check_llm_backend, LLMBackend
+from utils import ensure_config_dir, load_config, save_config, print_banner
 
 app = typer.Typer(
     name="locopilot",
