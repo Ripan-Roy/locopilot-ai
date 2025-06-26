@@ -1,27 +1,20 @@
-name: CI/CD Pipeline
+name: Publish to PyPI
 
 on:
   push:
-    branches: [ main ]
     tags:
       - 'v*'
-  pull_request:
-    branches: [ main ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12']
-    
     steps:
       - uses: actions/checkout@v4
       
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.11'
       
       - name: Install dependencies
         run: |
@@ -29,25 +22,16 @@ jobs:
           pip install pytest pytest-cov pytest-mock
           pip install -r requirements.txt
       
-      - name: Run tests with coverage
+      - name: Run tests
         run: |
-          pytest tests/ -v --cov=. --cov-report=xml --cov-report=term
+          pytest tests/ -v
         env:
           CI: true
           PYTHONDONTWRITEBYTECODE: 1
           PYTHONPATH: ${{ github.workspace }}
-      
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./coverage.xml
-          flags: unittests
-          name: codecov-umbrella
-          fail_ci_if_error: false
 
   publish:
-    needs: test  # This job will only run after 'test' job succeeds
-    if: startsWith(github.ref, 'refs/tags/v')
+    needs: test
     runs-on: ubuntu-latest
     
     steps:
