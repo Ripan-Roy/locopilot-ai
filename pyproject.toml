@@ -46,9 +46,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Ripan-Roy/Locopilot-ai"
-Repository = "https://github.com/Ripan-Roy/Locopilot-ai.git"
-Issues = "https://github.com/Ripan-Roy/Locopilot-ai/issues"
+Homepage = "https://github.com/Ripan-Roy/locopilot-ai"
+Repository = "https://github.com/Ripan-Roy/locopilot-ai.git"
+Issues = "https://github.com/Ripan-Roy/locopilot-ai/issues"
 
 [project.scripts]
 locopilot = "cli:app"
