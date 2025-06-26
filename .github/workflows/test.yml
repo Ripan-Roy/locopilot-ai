@@ -33,6 +33,7 @@ jobs:
         env:
           CI: true
           PYTHONDONTWRITEBYTECODE: 1
+          PYTHONPATH: ${{ github.workspace }}
       
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
