@@ -90,8 +90,8 @@ Key components:
 
 ### Install Locopilot
 ```bash
-git clone https://github.com/yourname/locopilot.git
-cd locopilot
+git clone https://github.com/Ripan-Roy/Locopilot-ai.git
+cd locopilot-ai
 pip install -e .
 ```
 
@@ -175,20 +175,24 @@ Anything not starting with `/` is treated as a task in the current mode!
 ## 🗂️ Project Structure
 
 ```
-locopilot/
-├── locopilot/
-│   ├── __init__.py
-│   ├── cli.py            # CLI entrypoint, shell/repl logic
-│   ├── agent.py          # LangGraph workflow graph and nodes
-│   ├── memory.py         # Session/context memory management
-│   ├── utils.py          # API, file, config helpers
-│   ├── connection.py     # Ollama/vLLM connection helpers
+locopilot-ai/
+├── __init__.py
+├── cli.py                # CLI entrypoint, shell/repl logic
+├── agent.py              # LangGraph workflow graph and nodes
+├── agent_backup.py       # Backup of agent implementation
+├── memory.py             # Session/context memory management
+├── utils.py              # API, file, config helpers
+├── connection.py         # Ollama/vLLM connection helpers
 ├── tests/
 │   └── test_basic.py
+├── dist/                 # Built distribution files
+├── locopilot.egg-info/   # Package metadata
 ├── pyproject.toml
+├── requirements.txt
+├── setup.sh
 ├── README.md
 ├── LICENSE
-└── .gitignore
+└── env/                  # Virtual environment
 ```
 
 ## 🧠 Memory Management (with LangGraph)
