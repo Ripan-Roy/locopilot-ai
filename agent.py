@@ -6,7 +6,7 @@ from enum import Enum
 from langchain.agents import AgentExecutor
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.tools import Tool
-from langchain.schema import BaseMessage, HumanMessage, AIMessage
+from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from langchain.schema.runnable import RunnablePassthrough
 from langgraph.graph import StateGraph, END
 from rich.console import Console
@@ -98,10 +98,10 @@ class LocopilotAgent:
         
         # Add nodes
         workflow.add_node("parse_input", self._parse_input_node)
-        workflow.add_node("plan", self._plan_node)
+        workflow.add_node("planning", self._plan_node)
         workflow.add_node("edit", self._edit_node)
         workflow.add_node("summarize", self._summarize_node)
-        workflow.add_node("output", self._output_node)
+        workflow.add_node("generate_output", self._output_node)
         
         # Add edges
         workflow.set_entry_point("parse_input")
@@ -111,31 +111,44 @@ class LocopilotAgent:
             "parse_input",
             self._route_by_mode,
             {
-                "plan": "plan",
-                "chat": "output",
-                "explain": "output"
+                "planning": "planning",
+                "generate_output": "generate_output"
             }
         )
         
-        workflow.add_edge("plan", "edit")
+        workflow.add_edge("planning", "edit")
         workflow.add_edge("edit", "summarize")
         
         workflow.add_conditional_edges(
             "summarize",
             self._should_continue,
             {
-                "continue": "output",
+                "continue": "generate_output",
                 "end": END
             }
         )
         
-        workflow.add_edge("output", END)
+        workflow.add_edge("generate_output", END)
         
         return workflow.compile()
     
     def _parse_input_node(self, state: AgentState) -> AgentState:
         """Parse user input and determine action."""
-        state["mode"] = self.memory.session_state.mode
+        task = state["task"].lower().strip()
+        
+        # Check if this looks like a conversational message
+        conversational_patterns = [
+            "hi", "hello", "hey", "good morning", "good afternoon", "good evening",
+            "how are you", "what's up", "thanks", "thank you", "bye", "goodbye",
+            "help", "what can you do", "who are you", "what are you"
+        ]
+        
+        # If it's a short conversational message, switch to chat mode
+        if any(pattern in task for pattern in conversational_patterns) or len(task.split()) <= 3:
+            state["mode"] = "chat"
+        else:
+            state["mode"] = self.memory.session_state.mode
+        
         return state
     
     def _plan_node(self, state: AgentState) -> AgentState:
@@ -163,7 +176,8 @@ Create a step-by-step plan to accomplish this task. Be specific about which file
 Format your response as a numbered list."""
         
         # Get plan from LLM
-        plan = self.llm.invoke(prompt)
+        llm_response = self.llm.invoke(prompt)
+        plan = str(llm_response.content) if hasattr(llm_response, 'content') else str(llm_response)
         state["plan"] = plan
         
         return state
@@ -186,7 +200,8 @@ And this task: {task}
 
 What specific file changes need to be made? List each file and the changes."""
         
-        edit_response = self.llm.invoke(edit_prompt)
+        llm_response = self.llm.invoke(edit_prompt)
+        edit_response = str(llm_response.content) if hasattr(llm_response, 'content') else str(llm_response)
         
         # Track the edit
         self.memory.add_file_edit(
@@ -220,13 +235,20 @@ What specific file changes need to be made? List each file and the changes."""
         task = state["task"]
         
         if mode == "chat":
-            # Simple chat response
-            response = self.llm.invoke(task)
+            # Enhanced chat response with context
+            prompt = f"""You are Locopilot, a friendly coding assistant. Respond conversationally to the user's message.
+
+User message: {task}
+
+Be helpful, friendly, and if appropriate, mention what coding tasks you can help with. Keep responses concise but warm."""
+            llm_response = self.llm.invoke(prompt)
+            response = str(llm_response.content) if hasattr(llm_response, 'content') else str(llm_response)
         elif mode == "explain":
             # Explanation mode
             context = self.memory.get_context_summary()
             prompt = f"Explain the following in detail:\n{task}\n\nContext:\n{context}"
-            response = self.llm.invoke(prompt)
+            llm_response = self.llm.invoke(prompt)
+            response = str(llm_response.content) if hasattr(llm_response, 'content') else str(llm_response)
         else:
             # Do/Refactor mode - summarize what was done
             plan = state.get("plan", "No plan")
@@ -248,11 +270,11 @@ What specific file changes need to be made? List each file and the changes."""
         mode = state["mode"]
         
         if mode in ["do", "refactor"]:
-            return "plan"
+            return "planning"
         elif mode in ["chat", "explain"]:
-            return "output"
+            return "generate_output"
         else:
-            return "plan"
+            return "planning"
     
     def _should_continue(self, state: AgentState) -> str:
         """Determine if we should continue or end."""
@@ -277,6 +299,46 @@ What specific file changes need to be made? List each file and the changes."""
         result = self.graph.invoke(initial_state)
         
         return result.get("output", "Task processing failed.")
+    
+    def process_task_streaming(self, task: str):
+        """Process a user task with streaming output."""
+        import time
+        
+        # Check if this looks like a conversational message
+        task_lower = task.lower().strip()
+        conversational_patterns = [
+            "hi", "hello", "hey", "good morning", "good afternoon", "good evening",
+            "how are you", "what's up", "thanks", "thank you", "bye", "goodbye",
+            "help", "what can you do", "who are you", "what are you"
+        ]
+        
+        # Determine if this should be streamed
+        is_conversational = any(pattern in task_lower for pattern in conversational_patterns) or len(task_lower.split()) <= 3
+        
+        if is_conversational:
+            # Stream chat response directly
+            prompt = f"""You are Locopilot, a friendly coding assistant. Respond conversationally to the user's message.
+
+User message: {task}
+
+Be helpful, friendly, and if appropriate, mention what coding tasks you can help with. Keep responses concise but warm."""
+            
+            complete_response = ""
+            for chunk in self.llm.stream(prompt):
+                # OllamaLLM returns strings directly, not objects
+                chunk_text = str(chunk)
+                complete_response += chunk_text
+                yield chunk_text
+                # Small delay for better visual streaming effect
+                time.sleep(0.01)
+            
+            # Update memory
+            self.memory.add_user_message(task)
+            self.memory.add_ai_message(complete_response)
+        else:
+            # For non-conversational tasks, use the normal workflow
+            response = self.process_task(task)
+            yield response
     
     def handle_slash_command(self, command: str) -> Optional[str]:
         """Handle slash commands."""

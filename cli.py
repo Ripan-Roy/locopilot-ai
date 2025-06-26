@@ -7,6 +7,8 @@ from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from rich.console import Console
 from rich.panel import Panel
+from rich.live import Live
+from rich.text import Text
 
 from agent import LocopilotAgent
 from connection import check_llm_backend, LLMBackend
@@ -156,9 +158,22 @@ def _start_shell(config: dict, project_path: Path):
                 elif result:
                     console.print(result)
             else:
-                # Process regular task
-                response = agent.process_task(user_input)
-                console.print(Panel(response, title="Locopilot", border_style="cyan"))
+                # Process regular task with streaming
+                full_response = ""
+                
+                # Create a panel for streaming content
+                with Live(
+                    Panel("", title="Locopilot", border_style="cyan"),
+                    console=console,
+                    refresh_per_second=10
+                ) as live:
+                    for chunk in agent.process_task_streaming(user_input):
+                        full_response += chunk
+                        # Update the live panel with current content
+                        live.update(Panel(full_response, title="Locopilot", border_style="cyan"))
+                
+                # Final newline for separation
+                console.print()
                 
         except KeyboardInterrupt:
             console.print("\n[yellow]Use /end to exit or Ctrl+C again to force quit[/yellow]")

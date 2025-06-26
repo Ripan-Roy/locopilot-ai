@@ -3,8 +3,9 @@ from enum import Enum
 from typing import Optional, Dict, Any
 
 import httpx
-from langchain_community.llms import Ollama, VLLMOpenAI
-from langchain.base_language import BaseLanguageModel
+from langchain_ollama import OllamaLLM
+from langchain_community.llms import VLLMOpenAI
+from langchain_core.language_models import BaseLanguageModel
 
 
 class LLMBackend(Enum):
@@ -53,7 +54,7 @@ def get_llm_client(
     backend_enum = LLMBackend(backend)
     
     if backend_enum == LLMBackend.OLLAMA:
-        return Ollama(
+        return OllamaLLM(
             model=model,
             temperature=temperature,
             base_url="http://localhost:11434",
