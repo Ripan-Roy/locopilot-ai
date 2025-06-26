@@ -1,5 +1,10 @@
 # 🚀 Locopilot
 
+[![PyPI version](https://badge.fury.io/py/locopilot.svg)](https://badge.fury.io/py/locopilot)
+[![Python](https://img.shields.io/pypi/pyversions/locopilot.svg)](https://pypi.org/project/locopilot/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/Ripan-Roy/Locopilot-ai.svg?style=social&label=Star)](https://github.com/Ripan-Roy/Locopilot-ai)
+
 Locopilot is an open-source, local-first, agentic coding assistant built for developers. It leverages local LLMs (via Ollama or vLLM), and advanced memory management using LangGraph, to automate, plan, and edit codebases—all inside an interactive shell.
 
 - **Private**: All code and prompts stay on your machine.
@@ -89,6 +94,13 @@ Key components:
 - pip
 
 ### Install Locopilot
+
+**Option 1: Install from PyPI (Recommended)**
+```bash
+pip install locopilot
+```
+
+**Option 2: Install from Source**
 ```bash
 git clone https://github.com/Ripan-Roy/Locopilot-ai.git
 cd locopilot-ai
@@ -228,6 +240,15 @@ Locopilot is inspired by Copilot, Claude Code, Dev-GPT, OpenDevin, and the emerg
 ## 🚦 Quickstart
 
 ```bash
+# Install from PyPI
+pip install locopilot
+
+# Initialize in your project
 locopilot init
+
 # ... then just type your coding tasks and manage the session with slash commands!
 ```
+
+**Links:**
+- [PyPI Package](https://pypi.org/project/locopilot/)
+- [GitHub Repository](https://github.com/Ripan-Roy/Locopilot-ai)
