@@ -302,7 +302,6 @@ Be helpful, friendly, and if appropriate, mention what coding tasks you can help
     
     def process_task_streaming(self, task: str):
         """Process a user task with streaming output."""
-        import time
         
         # Check if this looks like a conversational message
         task_lower = task.lower().strip()
@@ -329,8 +328,7 @@ Be helpful, friendly, and if appropriate, mention what coding tasks you can help
                 chunk_text = str(chunk)
                 complete_response += chunk_text
                 yield chunk_text
-                # Small delay for better visual streaming effect
-                time.sleep(0.01)
+                # No delay for immediate streaming
             
             # Update memory
             self.memory.add_user_message(task)

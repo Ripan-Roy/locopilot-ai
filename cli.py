@@ -6,9 +6,6 @@ from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from rich.console import Console
-from rich.panel import Panel
-from rich.live import Live
-from rich.text import Text
 
 from agent import LocopilotAgent
 from connection import check_llm_backend, LLMBackend
@@ -159,20 +156,39 @@ def _start_shell(config: dict, project_path: Path):
                     console.print(result)
             else:
                 # Process regular task with streaming
+                console.print("╭" + "─" * 78 + " Locopilot " + "─" * 78 + "╮")
+                console.print("│ ", end="")
+                
                 full_response = ""
+                line_length = 0
+                max_width = 164  # Width of the box minus borders and padding
                 
-                # Create a panel for streaming content
-                with Live(
-                    Panel("", title="Locopilot", border_style="cyan"),
-                    console=console,
-                    refresh_per_second=10
-                ) as live:
-                    for chunk in agent.process_task_streaming(user_input):
-                        full_response += chunk
-                        # Update the live panel with current content
-                        live.update(Panel(full_response, title="Locopilot", border_style="cyan"))
+                for chunk in agent.process_task_streaming(user_input):
+                    full_response += chunk
+                    
+                    # Handle line wrapping and special characters
+                    for char in chunk:
+                        if char == '\n':
+                            # New line
+                            console.print()
+                            console.print("│ ", end="")
+                            line_length = 0
+                        elif line_length >= max_width:
+                            # Wrap long lines
+                            console.print()
+                            console.print("│ " + char, end="")
+                            line_length = 1
+                        else:
+                            console.print(char, end="")
+                            line_length += 1
+                    
+                    # Flush output immediately
+                    console.file.flush()
                 
-                # Final newline for separation
+                # Close the box
+                if line_length > 0:
+                    console.print()
+                console.print("╰" + "─" * 166 + "╯")
                 console.print()
                 
         except KeyboardInterrupt:
