@@ -5,6 +5,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub stars](https://img.shields.io/github/stars/Ripan-Roy/locopilot-ai.svg?style=social&label=Star)](https://github.com/Ripan-Roy/locopilot-ai)
 
+<div align="center">
+  <img src="assets/locopilot-demo.png" alt="Locopilot Demo" width="800"/>
+</div>
+
 Locopilot is an open-source, local-first, agentic coding assistant built for developers. It leverages local LLMs (via Ollama or vLLM), and advanced memory management using LangGraph, to automate, plan, and edit codebases—all inside an interactive shell.
 
 - **Private**: All code and prompts stay on your machine.
