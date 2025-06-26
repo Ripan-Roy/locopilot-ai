@@ -197,7 +197,7 @@ def _start_shell(config: dict, project_path: Path):
 @app.command()
 def version():
     """Show Locopilot version."""
-    console.print("Locopilot v0.1.0")
+    console.print("Locopilot v0.1.3")
 
 
 if __name__ == "__main__":
