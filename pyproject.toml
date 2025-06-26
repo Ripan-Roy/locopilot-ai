@@ -1,6 +1,6 @@
 [project]
 name = "locopilot"
-version = "0.1.3"
+version = "0.1.4"
 description = "An open-source, local-first, agentic coding assistant"
 authors = [{name = "Locopilot Team", email = "locopilot@example.com"}]
 readme = "README.md"
