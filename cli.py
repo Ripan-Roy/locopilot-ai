@@ -6,6 +6,9 @@ from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from rich.console import Console
+from rich.panel import Panel
+from rich.live import Live
+from rich.text import Text
 
 from agent import LocopilotAgent
 from connection import check_llm_backend, LLMBackend
@@ -41,19 +44,19 @@ def init(
     ),
 ):
     """Initialize Locopilot in your project and start the interactive shell."""
-    
+
     print_banner()
-    
+
     # Set project path
     project_path = project_path or Path.cwd()
-    
+
     # Ensure config directory exists
     config_dir = ensure_config_dir(project_path)
     config_path = config_dir / "config.yaml"
-    
+
     # Check for existing config
     existing_config = load_config(config_path) if config_path.exists() else {}
-    
+
     # Determine backend
     if not backend:
         backend = existing_config.get("backend")
@@ -61,7 +64,7 @@ def init(
             # Check which backends are available
             ollama_available = check_llm_backend(LLMBackend.OLLAMA)
             vllm_available = check_llm_backend(LLMBackend.VLLM)
-            
+
             if ollama_available and not vllm_available:
                 backend = "ollama"
                 console.print("[green][/green] Ollama detected and selected")
@@ -76,16 +79,17 @@ def init(
                 )
             else:
                 console.print("[red][/red] No LLM backend detected!")
-                console.print("Please start Ollama (ollama serve) or vLLM server")
+                console.print(
+                    "Please start Ollama (ollama serve) or vLLM server")
                 raise typer.Exit(1)
-    
+
     # Validate backend
     backend_enum = LLMBackend(backend)
     if not check_llm_backend(backend_enum):
         console.print(f"[red][/red] {backend} is not running!")
         console.print(f"Please start {backend} server first")
         raise typer.Exit(1)
-    
+
     # Determine model
     if not model:
         model = existing_config.get("model")
@@ -100,7 +104,7 @@ def init(
                     "Enter model name",
                     default="deepseek-coder-6.7b"
                 )
-    
+
     # Save config
     config = {
         "backend": backend,
@@ -113,39 +117,43 @@ def init(
         }
     }
     save_config(config_path, config)
-    
-    console.print(f"[green][/green] Initialized Locopilot with {backend} backend and {model} model")
-    console.print(f"[green][/green] Project context initialized at {project_path}")
-    
+
+    console.print(
+        f"[green][/green] Initialized Locopilot with {backend} backend and {model} model")
+    console.print(
+        f"[green][/green] Project context initialized at {project_path}")
+
     # Start interactive shell
     _start_shell(config, project_path)
 
 
 def _start_shell(config: dict, project_path: Path):
     """Start the interactive Locopilot shell."""
-    
+
     # Initialize agent
     agent = LocopilotAgent(config, project_path)
-    
+
     # Setup prompt session with history
     history_file = ensure_config_dir(project_path) / "history.txt"
     session = PromptSession(
         history=FileHistory(str(history_file)),
         auto_suggest=AutoSuggestFromHistory(),
     )
-    
+
     console.print("\n[bold green]Locopilot Shell[/bold green]")
-    console.print(f"Mode: [cyan]{config['mode']}[/cyan] | Model: [cyan]{config['model']}[/cyan]")
-    console.print("Type your task or use slash commands. Type /help for commands.\n")
-    
+    console.print(
+        f"Mode: [cyan]{config['mode']}[/cyan] | Model: [cyan]{config['model']}[/cyan]")
+    console.print(
+        "Type your task or use slash commands. Type /help for commands.\n")
+
     while True:
         try:
             # Get user input
             user_input = session.prompt("> ", multiline=False)
-            
+
             if not user_input.strip():
                 continue
-            
+
             # Handle slash commands
             if user_input.startswith("/"):
                 result = agent.handle_slash_command(user_input)
@@ -156,43 +164,26 @@ def _start_shell(config: dict, project_path: Path):
                     console.print(result)
             else:
                 # Process regular task with streaming
-                console.print("╭" + "─" * 78 + " Locopilot " + "─" * 78 + "╮")
-                console.print("│ ", end="")
-                
                 full_response = ""
-                line_length = 0
-                max_width = 164  # Width of the box minus borders and padding
-                
-                for chunk in agent.process_task_streaming(user_input):
-                    full_response += chunk
-                    
-                    # Handle line wrapping and special characters
-                    for char in chunk:
-                        if char == '\n':
-                            # New line
-                            console.print()
-                            console.print("│ ", end="")
-                            line_length = 0
-                        elif line_length >= max_width:
-                            # Wrap long lines
-                            console.print()
-                            console.print("│ " + char, end="")
-                            line_length = 1
-                        else:
-                            console.print(char, end="")
-                            line_length += 1
-                    
-                    # Flush output immediately
-                    console.file.flush()
-                
-                # Close the box
-                if line_length > 0:
-                    console.print()
-                console.print("╰" + "─" * 166 + "╯")
+
+                # Create a panel for streaming content
+                with Live(
+                    Panel("", title="Locopilot", border_style="cyan"),
+                    console=console,
+                    refresh_per_second=10
+                ) as live:
+                    for chunk in agent.process_task_streaming(user_input):
+                        full_response += chunk
+                        # Update the live panel with current content
+                        live.update(
+                            Panel(full_response, title="Locopilot", border_style="cyan"))
+
+                # Final newline for separation
                 console.print()
-                
+
         except KeyboardInterrupt:
-            console.print("\n[yellow]Use /end to exit or Ctrl+C again to force quit[/yellow]")
+            console.print(
+                "\n[yellow]Use /end to exit or Ctrl+C again to force quit[/yellow]")
             try:
                 continue
             except KeyboardInterrupt:
