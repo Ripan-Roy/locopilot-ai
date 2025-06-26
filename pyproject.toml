@@ -25,6 +25,7 @@ dependencies = [
     "langchain>=0.1.0",
     "langgraph>=0.0.20",
     "langchain-community>=0.0.10",
+    "langchain-ollama>=0.3.0",
     "pyyaml>=6.0",
     "httpx>=0.24.0",
     "rich>=13.0.0",
@@ -45,9 +46,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourname/locopilot"
-Repository = "https://github.com/yourname/locopilot.git"
-Issues = "https://github.com/yourname/locopilot/issues"
+Homepage = "https://github.com/Ripan-Roy/Locopilot-ai"
+Repository = "https://github.com/Ripan-Roy/Locopilot-ai.git"
+Issues = "https://github.com/Ripan-Roy/Locopilot-ai/issues"
 
 [project.scripts]
 locopilot = "cli:app"
