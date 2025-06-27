@@ -1,6 +1,6 @@
 [project]
 name = "locopilot"
-version = "0.1.7"
+version = "0.1.8"
 description = "An open-source, local-first, agentic coding assistant"
 authors = [{name = "Locopilot Team", email = "locopilot@example.com"}]
 readme = "README.md"
@@ -58,7 +58,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules = ["cli", "agent", "memory", "utils", "connection"]
+py-modules = ["cli", "agent", "memory", "utils", "connection", "plan_executor"]
 
 [tool.black]
 line-length = 88

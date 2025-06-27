@@ -72,6 +72,14 @@ Thumbs.db
 .locopilot/
 *.log
 
+# Development files
+demo_*.py
+example_*.py
+test_*.py.backup
+
+# Package management
+requirements.txt
+
 # Jupyter Notebook
 .ipynb_checkpoints
 
