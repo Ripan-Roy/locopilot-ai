@@ -1,8 +1,8 @@
 [project]
 name = "locopilot"
-version = "0.1.8"
+version = "0.1.9"
 description = "An open-source, local-first, agentic coding assistant"
-authors = [{name = "Locopilot Team", email = "locopilot@example.com"}]
+authors = [{name = "Ripan Roy", email = "ripanroy111@gmail.com"}]
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.8"
