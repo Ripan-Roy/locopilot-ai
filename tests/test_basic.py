@@ -1,8 +1,8 @@
 import pytest
 from pathlib import Path
-from connection import LLMBackend, check_llm_backend
-from utils import ensure_config_dir, get_project_files
-from memory import SessionState, LocopilotMemory
+from locopilot.llm.connection import LLMBackend, check_llm_backend
+from locopilot.utils.file_ops import ensure_config_dir, get_project_files
+from locopilot.core.memory import SessionState, LocopilotMemory
 
 
 def test_session_state():
@@ -51,4 +51,3 @@ def test_get_project_files(tmp_path):
 def test_llm_backend_enum():
     """Test LLMBackend enum."""
     assert LLMBackend.OLLAMA.value == "ollama"
-    assert LLMBackend.VLLM.value == "vllm"

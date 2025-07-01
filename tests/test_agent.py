@@ -1,15 +1,15 @@
 import pytest
 from unittest.mock import Mock, patch
 from pathlib import Path
-from agent import LocopilotAgent
+from locopilot.core.agent import LocopilotAgent
 
 
 class TestLocopilotAgent:
     """Test LocopilotAgent functionality."""
     
-    @patch('agent.format_file_tree')
-    @patch('agent.get_project_files')
-    @patch('agent.get_llm_client')
+    @patch('locopilot.core.agent.format_file_tree')
+    @patch('locopilot.core.agent.get_project_files')
+    @patch('locopilot.core.agent.get_llm_client')
     def test_agent_initialization(self, mock_get_llm_client, mock_get_project_files, mock_format_file_tree):
         """Test agent initialization."""
         mock_llm = Mock()
@@ -34,10 +34,10 @@ class TestLocopilotAgent:
         assert agent.project_path == project_path
         mock_get_llm_client.assert_called_once()
     
-    @patch('agent.format_file_tree')
-    @patch('agent.get_project_files')
-    @patch('agent.get_llm_client')
-    @patch('agent.LocopilotMemory')
+    @patch('locopilot.core.agent.format_file_tree')
+    @patch('locopilot.core.agent.get_project_files')
+    @patch('locopilot.core.agent.get_llm_client')
+    @patch('locopilot.core.agent.LocopilotMemory')
     def test_agent_with_memory(self, mock_memory_class, mock_get_llm_client, mock_get_project_files, mock_format_file_tree):
         """Test agent with memory initialization."""
         mock_llm = Mock()
@@ -48,7 +48,7 @@ class TestLocopilotAgent:
         mock_format_file_tree.return_value = "mocked file tree"
         
         config = {
-            "backend": "vllm",
+            "backend": "ollama",
             "model": "llama2",
             "temperature": 0.2,
             "memory": {
