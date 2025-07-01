@@ -1,6 +1,6 @@
 [project]
 name = "locopilot"
-version = "0.1.9"
+version = "0.1.10"
 description = "An open-source, local-first, agentic coding assistant"
 authors = [{name = "Ripan Roy", email = "ripanroy111@gmail.com"}]
 readme = "README.md"
@@ -51,14 +51,14 @@ Repository = "https://github.com/Ripan-Roy/locopilot-ai.git"
 Issues = "https://github.com/Ripan-Roy/locopilot-ai/issues"
 
 [project.scripts]
-locopilot = "cli:app"
+locopilot = "locopilot.cli.app:app"
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules = ["cli", "agent", "memory", "utils", "connection", "plan_executor"]
+packages = {find = {where = ["."], include = ["locopilot*"]}}
 
 [tool.black]
 line-length = 88

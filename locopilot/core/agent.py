@@ -11,15 +11,15 @@ from langchain.schema.runnable import RunnablePassthrough
 from langgraph.graph import StateGraph, END
 from rich.console import Console
 
-from connection import get_llm_client
-from memory import LocopilotMemory, SessionState
-from utils import (
+from locopilot.llm.connection import get_llm_client
+from locopilot.core.memory import LocopilotMemory, SessionState
+from locopilot.utils.file_ops import (
     get_project_files,
     read_file_content,
     create_file_edit_prompt,
     format_file_tree
 )
-from plan_executor import PlanExecutor, PlanAction, ActionType
+from locopilot.core.executor import PlanExecutor, PlanAction, ActionType
 
 
 console = Console()
@@ -237,7 +237,7 @@ Your Plan:"""
         mode = state["mode"]
         
         # Import at function level to avoid circular imports
-        from plan_executor import PlanAction, ActionType
+        from locopilot.core.executor import PlanAction, ActionType
         
         # Generate specific actions from the plan
         action_prompt = f"""Convert this plan into executable JSON actions:
@@ -396,7 +396,7 @@ Generate only the file content, no explanations or markdown formatting:"""
     
     def _parse_plan_fallback(self, plan: str, task: str) -> List:
         """Fallback parser for extracting actions from plan text."""
-        from plan_executor import PlanAction, ActionType
+        from locopilot.core.executor import PlanAction, ActionType
         import re
         
         actions = []

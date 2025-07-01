@@ -4,7 +4,7 @@ import shutil
 from pathlib import Path
 import json
 
-from plan_executor import PlanExecutor, PlanAction, ActionType
+from locopilot.core.executor import PlanExecutor, PlanAction, ActionType
 
 
 class TestPlanExecutor:

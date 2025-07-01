@@ -9,7 +9,7 @@
   <img src="assets/locopilot-demo.png" alt="Locopilot Demo" width="800"/>
 </div>
 
-Locopilot is an open-source, local-first, agentic coding assistant built for developers. It leverages local LLMs (via Ollama or vLLM), and advanced memory management using LangGraph, to automate, plan, and edit codebases—all inside an interactive shell.
+Locopilot is an open-source, local-first, agentic coding assistant built for developers. It leverages local LLMs (via Ollama), and advanced memory management using LangGraph, to automate, plan, and edit codebases—all inside an interactive shell.
 
 - **Private**: All code and prompts stay on your machine.
 - **Agentic**: Locopilot plans, edits, iterates, and manages your coding tasks.
@@ -31,7 +31,7 @@ Locopilot is an open-source, local-first, agentic coding assistant built for dev
 
 ## ✨ Features
 
-- **Local LLM Backend**: Bring your own Ollama or vLLM server and code with any open-source LLM.
+- **Local LLM Backend**: Bring your own Ollama server and code with any open-source LLM.
 - **LangGraph Agent Workflow**: Plans, executes, edits, and compresses memory as a stateful, extensible graph.
 - **Interactive Shell/REPL**: After init, drop into a chat-like agent terminal—just type coding tasks or slash commands.
 - **Slash Command Support**: `/model`, `/change-mode`, `/concise`, `/clear`, `/new`, `/end`, `/help`, and more.
@@ -44,7 +44,7 @@ Locopilot is an open-source, local-first, agentic coding assistant built for dev
 
 ### 1. Initialization
 Run `locopilot init` in your project root.
-- Locopilot checks Ollama/vLLM, prompts for backend/model, sets up `.locopilot/config.yaml`.
+- Locopilot checks Ollama, prompts for model, sets up `.locopilot/config.yaml`.
 - You're dropped into an interactive agent shell (REPL).
 
 ### 2. Agentic Workflow (via LangGraph)
@@ -68,9 +68,8 @@ Key components:
 - **LangGraph Workflow**:
   - **Nodes**: Planning, file edit, summarization, slash command handler, etc.
   - **Edges**: Control session flow, branching between commands and prompts.
-- **LLM Backends**:
+- **LLM Backend**:
   - **Ollama**: For running CodeLlama, DeepSeek, etc.
-  - **vLLM**: OpenAI-compatible, GPU-powered.
 - **Memory Layer**:
   - LangChain/LangGraph memory objects (buffer, summary, vector, hybrid).
   - Summarizes old context using the LLM to avoid hitting token/window limits.
@@ -94,7 +93,7 @@ Key components:
 
 ### Requirements
 - Python 3.8+
-- Ollama or vLLM running locally
+- Ollama running locally
 - pip
 
 ### Install Locopilot
@@ -107,7 +106,7 @@ pip install locopilot
 **Option 2: Install from Source**
 ```bash
 git clone https://github.com/Ripan-Roy/locopilot-ai.git
-cd locopilot-ai
+cd locopilot-backend
 pip install -e .
 ```
 
@@ -117,11 +116,6 @@ pip install -e .
 ```bash
 ollama serve
 ollama pull codellama:latest
-```
-
-**vLLM:**
-```bash
-python -m vllm.entrypoints.openai.api_server --model <your-model>
 ```
 
 ### Initialize and Enter the Agent Shell
@@ -191,24 +185,40 @@ Anything not starting with `/` is treated as a task in the current mode!
 ## 🗂️ Project Structure
 
 ```
-locopilot-ai/
-├── __init__.py
-├── cli.py                # CLI entrypoint, shell/repl logic
-├── agent.py              # LangGraph workflow graph and nodes
-├── agent_backup.py       # Backup of agent implementation
-├── memory.py             # Session/context memory management
-├── utils.py              # API, file, config helpers
-├── connection.py         # Ollama/vLLM connection helpers
-├── tests/
-│   └── test_basic.py
-├── dist/                 # Built distribution files
-├── locopilot.egg-info/   # Package metadata
-├── pyproject.toml
-├── requirements.txt
-├── setup.sh
+locopilot-backend/
+├── locopilot/                  # Main package directory
+│   ├── __init__.py
+│   ├── core/                   # Core functionality
+│   │   ├── __init__.py
+│   │   ├── agent.py           # LangGraph workflow and nodes
+│   │   ├── memory.py          # Session/context memory management
+│   │   └── executor.py        # Plan execution engine
+│   ├── llm/                    # LLM backend handling
+│   │   ├── __init__.py
+│   │   ├── connection.py      # Ollama connection helpers
+│   │   └── backends/          # Backend-specific implementations
+│   ├── cli/                    # CLI components
+│   │   ├── __init__.py
+│   │   ├── app.py             # CLI entrypoint, shell/REPL logic
+│   │   └── commands/          # CLI command implementations
+│   └── utils/                  # Utility functions
+│       ├── __init__.py
+│       └── file_ops.py        # File operations, config helpers
+├── tests/                      # Test suite
+│   ├── conftest.py
+│   ├── test_agent.py
+│   ├── test_basic.py
+│   ├── test_connection.py
+│   └── test_plan_executor.py
+├── scripts/                    # Setup and utility scripts
+│   └── setup.sh
+├── docs/                       # Documentation
+├── assets/                     # Static assets
+│   └── locopilot-demo.png
+├── pyproject.toml             # Package configuration
+├── requirements.txt           # Dependencies
 ├── README.md
-├── LICENSE
-└── env/                  # Virtual environment
+└── LICENSE
 ```
 
 ## 🧠 Memory Management (with LangGraph)

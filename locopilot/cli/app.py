@@ -10,9 +10,9 @@ from rich.panel import Panel
 from rich.live import Live
 from rich.text import Text
 
-from agent import LocopilotAgent
-from connection import check_llm_backend, LLMBackend
-from utils import ensure_config_dir, load_config, save_config, print_banner
+from locopilot.core.agent import LocopilotAgent
+from locopilot.llm.connection import check_llm_backend, LLMBackend
+from locopilot.utils.file_ops import ensure_config_dir, load_config, save_config, print_banner
 
 app = typer.Typer(
     name="locopilot",
@@ -28,7 +28,7 @@ def init(
         None,
         "--backend",
         "-b",
-        help="LLM backend to use (ollama/vllm)",
+        help="LLM backend to use (ollama)",
     ),
     model: Optional[str] = typer.Option(
         None,
@@ -61,26 +61,16 @@ def init(
     if not backend:
         backend = existing_config.get("backend")
         if not backend:
-            # Check which backends are available
+            # Check if Ollama is available
             ollama_available = check_llm_backend(LLMBackend.OLLAMA)
-            vllm_available = check_llm_backend(LLMBackend.VLLM)
 
-            if ollama_available and not vllm_available:
+            if ollama_available:
                 backend = "ollama"
                 console.print("[green][/green] Ollama detected and selected")
-            elif vllm_available and not ollama_available:
-                backend = "vllm"
-                console.print("[green][/green] vLLM detected and selected")
-            elif ollama_available and vllm_available:
-                backend = typer.prompt(
-                    "Both Ollama and vLLM detected. Which backend?",
-                    type=typer.Choice(["ollama", "vllm"]),
-                    default="ollama"
-                )
             else:
                 console.print("[red][/red] No LLM backend detected!")
                 console.print(
-                    "Please start Ollama (ollama serve) or vLLM server")
+                    "Please start Ollama (ollama serve)")
                 raise typer.Exit(1)
 
     # Validate backend

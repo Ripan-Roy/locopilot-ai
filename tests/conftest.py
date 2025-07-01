@@ -7,7 +7,6 @@ import os
 def mock_environment():
     """Mock environment variables for tests."""
     with patch.dict(os.environ, {
-        'VLLM_API_BASE': 'http://localhost:8000',
         'OLLAMA_HOST': 'http://localhost:11434'
     }):
         yield
@@ -21,14 +20,6 @@ def mock_ollama_client():
         mock.return_value = client
         yield client
 
-
-@pytest.fixture
-def mock_vllm_client():
-    """Mock vLLM client."""
-    with patch('connection.VLLMOpenAI') as mock:
-        client = Mock()
-        mock.return_value = client
-        yield client
 
 
 @pytest.fixture
